@@ -1,5 +1,5 @@
 const { loadModel } = require("./model/model")
-const { preprocessImage, historyResponse, predictResponse, historyWithNoDiseaseResponse, historyWithDiseaseResponse } = require("./utils")
+const { preprocessImage, predictResponse, historyWithNoDiseaseResponse, historyWithDiseaseResponse } = require("./utils")
 const classes = require("./model/classes")
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuid } = require("uuid")

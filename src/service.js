@@ -1,5 +1,5 @@
 const { loadModel } = require("./model/model")
-const { preprocessImage, predictResponse, historyWithNoDiseaseResponse, historyWithDiseaseResponse } = require("./utils")
+const { preprocessImage, publicPredictResponse, historyResponse } = require("./utils")
 const classes = require("./model/classes")
 const { createClient } = require('@supabase/supabase-js');
 const { v4: uuid } = require("uuid")
@@ -24,20 +24,17 @@ class Service {
 
         const imageTensor = await preprocessImage(file.buffer, size)
 
-        const prediction = model.predict(imageTensor)
-        const result = await prediction.array()
+        const predict = model.predict(imageTensor)
+        const result = await predict.array()
 
-        const predictionArray = result[0]
-        const maxIndex = predictionArray.indexOf(Math.max(...predictionArray))
+        const predictArray = result[0]
+        const maxIndex = predictArray.indexOf(Math.max(...predictArray))
         const predictedClass = classes[plant][maxIndex]
+        console.log(predictedClass)
 
-        if (predictedClass === "Healthy"){
-            return predictedClass
-        }
+        const prediction = await this.getPrediction(predictedClass)
 
-        const disease = await this.getDiseaseByName(predictedClass)
-
-        return predictResponse(disease)
+        return publicPredictResponse(prediction)
     }
 
     async predict(file, { user_id, plant, latitude, longitude }){
@@ -46,16 +43,32 @@ class Service {
 
         const imageTensor = await preprocessImage(file.buffer, size)
 
-        const prediction = model.predict(imageTensor)
-        const result = await prediction.array()
+        const predict = model.predict(imageTensor)
+        const result = await predict.array()
 
-        const predictionArray = result[0]
-        const maxIndex = predictionArray.indexOf(Math.max(...predictionArray))
+        const predictArray = result[0]
+        const maxIndex = predictArray.indexOf(Math.max(...predictArray))
         const predictedClass = classes[plant][maxIndex]
 
-        const history = await this.addHistory(file, { user_id, prediction: predictedClass === "Healthy" ? null : predictedClass, latitude, longitude })
+        const history = await this.addHistory(file, { user_id, status: predictedClass, latitude, longitude })
 
         return history
+    }
+
+    async getHistoriesMap(){
+        const query = "SELECT * FROM history"
+        const result = await this._db.query(query)
+        
+        const historyList = await Promise.all(
+            result.rows.map(async(row) => {
+                const user = await this.getUserById(row.user_id)
+                const prediction = await this.getPrediction(row.status)
+
+                return historyResponse(row, user, prediction)
+            })
+        )
+
+        return historyList
     }
 
     async getHistories(user_id){
@@ -65,7 +78,16 @@ class Service {
         }
         const result = await this._db.query(query)
 
-        return result.rows
+        const user = await this.getUserById(user_id)
+
+        const historyList = await Promise.all(
+            result.rows.map(async(row) => {
+                const prediction = await this.getPrediction(row.status)
+                return historyResponse(row, user, prediction)
+            })
+        )
+
+        return historyList
     }
 
     async getHistoryById(id, user_id){
@@ -86,14 +108,14 @@ class Service {
         return result.rows[0]
     }
 
-    async addHistory(file, { user_id, prediction, latitude, longitude }){
+    async addHistory(file, { user_id, status, latitude, longitude }){
         const image_url = await this.addImage(file)
         const id = uuid()
         const createdAt = new Date()
         
         const query = {
-            text: "INSERT INTO history(id, user_id, latitude, longitude, disease, image_url, created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-            values: [id, user_id, latitude, longitude, prediction, image_url, createdAt]
+            text: "INSERT INTO history(id, user_id, latitude, longitude, status, image_url, created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
+            values: [id, user_id, latitude, longitude, status, image_url, createdAt]
         }
         const result = await this._db.query(query)
 
@@ -101,15 +123,9 @@ class Service {
             throw new Error("error")
         } 
 
-        const history = result.rows[0]
-        const user = await this.getUserById(user_id)
+        const prediction = await this.getPrediction(status)
 
-        if (!prediction){
-            return historyWithNoDiseaseResponse(history, user)
-        }
-        const disease = await this.getDiseaseByName(prediction)
-
-        return historyWithDiseaseResponse(history, user, disease)
+        return publicPredictResponse(prediction)
     }
 
     async deleteHistoryById(id, user_id){
@@ -123,10 +139,10 @@ class Service {
         await this._db.query(query)
     }
 
-    async getDiseaseByName(name){
+    async getPrediction(status){
         const query = {
-            text: "SELECT * FROM disease WHERE name = $1",
-            values: [name]
+            text: "SELECT * FROM predictions WHERE status = $1",
+            values: [status]
         }
         const result = await this._db.query(query)
 

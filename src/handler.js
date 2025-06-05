@@ -4,6 +4,7 @@ class Handler {
 
         this.publicPredict = this.publicPredict.bind(this)
         this.predict = this.predict.bind(this)
+        this.getHistoriesMap = this.getHistoriesMap.bind(this)
         this.getHistories = this.getHistories.bind(this)
         this.deleteHistory = this.deleteHistory.bind(this)
     }
@@ -33,6 +34,19 @@ class Handler {
             return res.status(200).json({
                 status: "success",
                 data: { prediction }      
+            })
+        } catch(error){
+            next(error)
+        }
+    }
+
+    async getHistoriesMap(_, res, next){
+        try {
+            const histories = await this._service.getHistoriesMap()
+
+            return res.status(200).json({
+                status: "success",
+                data: { histories }
             })
         } catch(error){
             next(error)

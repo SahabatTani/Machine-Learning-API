@@ -10,48 +10,36 @@ async function preprocessImage(buffer, size) {
     return tensor.div(255.0).expandDims(0)
 }
 
-const predictResponse = disease => {
+const publicPredictResponse = prediction => {
     return {
-        name: disease.name,
-        reason: disease.reason,
-        indication: disease.indication,
-        solution: disease.solution,
-        plant: disease.plant,
-        mediecene: disease.mediecene
+        status: prediction.status,
+        reason: prediction.reason,
+        indication: prediction.indication,
+        solution: prediction.solution,
+        plant: prediction.plant,
+        mediecene: prediction.mediecene
     }
 }
 
-const historyWithDiseaseResponse = (history, user, disease) => {
+const historyResponse = (history, user, prediction) => {
     return {
         id: history.id,
-        image_url: history.image_url,
+        image_url: `${process.env.SUPABASE_PUBLIC_URL_PREFIX}/${process.env.SUPABASE_BUCKET}/${history.image_url}`,
         latitude: history.latitude,
         longitude: history.longitude,
+        created_at: history.created_at,
         user: {
             fullname: user.fullname
         },
         prediction: {
-            disease_name: disease.name,
-            reason: disease.reason,
-            indication: disease.indication,
-            solution: disease.solution,
-            plant: disease.plant,
-            mediecene: disease.mediecene
+            status: prediction.status,
+            reason: prediction.reason,
+            indication: prediction.indication,
+            solution: prediction.solution,
+            plant: prediction.plant,
+            mediecene: prediction.mediecene
         }
     }
 }
 
-const historyWithNoDiseaseResponse = (history, user) => {
-    return {
-        id: history.id,
-        image_url: history.image_url,
-        latitude: history.latitude,
-        longitude: history.longitude,
-        user: {
-            fullname: user.fullname
-        },
-        prediction: "Healthy"
-    }
-}
-
-module.exports = { preprocessImage, predictResponse, historyWithDiseaseResponse, historyWithNoDiseaseResponse }
+module.exports = { preprocessImage, publicPredictResponse, historyResponse }

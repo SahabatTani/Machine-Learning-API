@@ -10,6 +10,7 @@ const router = db => {
 
     route.post("/api/public-predict", uploadMiddleware.single("image"), handler.publicPredict)
     route.post("/api/predict", authMiddleware, uploadMiddleware.single("image"), handler.predict)
+    route.get("/api/histories/map", handler.getHistoriesMap)
     route.get("/api/histories", authMiddleware, handler.getHistories)
     route.delete("/api/histories/:id", authMiddleware, handler.deleteHistory)
 

@@ -30,7 +30,6 @@ class Service {
         const predictArray = result[0]
         const maxIndex = predictArray.indexOf(Math.max(...predictArray))
         const predictedClass = classes[plant][maxIndex]
-        console.log(predictedClass)
 
         const prediction = await this.getPrediction(predictedClass)
 
@@ -50,7 +49,7 @@ class Service {
         const maxIndex = predictArray.indexOf(Math.max(...predictArray))
         const predictedClass = classes[plant][maxIndex]
 
-        const history = await this.addHistory(file, { user_id, status: predictedClass, latitude, longitude })
+        const history = await this.addHistory(file, { plant, user_id, status: predictedClass, latitude, longitude })
 
         return history
     }
@@ -108,14 +107,14 @@ class Service {
         return result.rows[0]
     }
 
-    async addHistory(file, { user_id, status, latitude, longitude }){
+    async addHistory(file, { plant, user_id, status, latitude, longitude }){
         const image_url = await this.addImage(file)
         const id = uuid()
         const createdAt = new Date()
         
         const query = {
-            text: "INSERT INTO history(id, user_id, latitude, longitude, status, image_url, created_at) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *",
-            values: [id, user_id, latitude, longitude, status, image_url, createdAt]
+            text: "INSERT INTO history(id, plant, user_id, latitude, longitude, status, image_url, created_at) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+            values: [id, plant, user_id, latitude, longitude, status, image_url, createdAt]
         }
         const result = await this._db.query(query)
 

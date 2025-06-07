@@ -13,6 +13,7 @@ const loadModel = async (modelName) => {
     if (parsed.format === "graph-model") {
         return await tf.loadGraphModel(modelPath);
     } else if (parsed.format === "layers-model") {
+        console.log("hai")
         return await tf.loadLayersModel(modelPath);
     } else {
         throw new Error("Unknown model format");

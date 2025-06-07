@@ -17,13 +17,14 @@ const publicPredictResponse = prediction => {
         indication: prediction.indication,
         solution: prediction.solution,
         plant: prediction.plant,
-        mediecene: prediction.mediecene
+        medicine: prediction.medicine
     }
 }
 
 const historyResponse = (history, user, prediction) => {
     return {
         id: history.id,
+        plant: history.plant,
         image_url: `${process.env.SUPABASE_PUBLIC_URL_PREFIX}/${process.env.SUPABASE_BUCKET}/${history.image_url}`,
         latitude: history.latitude,
         longitude: history.longitude,
@@ -37,7 +38,7 @@ const historyResponse = (history, user, prediction) => {
             indication: prediction.indication,
             solution: prediction.solution,
             plant: prediction.plant,
-            mediecene: prediction.mediecene
+            medicine: prediction.mediecene
         }
     }
 }

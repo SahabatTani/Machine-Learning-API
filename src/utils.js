@@ -17,7 +17,8 @@ const publicPredictResponse = prediction => {
         indication: prediction.indication,
         solution: prediction.solution,
         plant: prediction.plant,
-        medicine: prediction.medicine
+        medicine_image_url: prediction.medicine_image_url,
+        shop_url: prediction.shop_url
     }
 }
 
@@ -38,7 +39,8 @@ const historyResponse = (history, user, prediction) => {
             indication: prediction.indication,
             solution: prediction.solution,
             plant: prediction.plant,
-            medicine: prediction.mediecene
+            medicine_image_url: prediction.medicine_image_url,
+            shop_url: prediction.shop_url
         }
     }
 }

@@ -123,7 +123,7 @@ Deteksi penyakit tanaman.
 **Request Body:**
 ```json
 {
-    "image": image_file,
+    "image": "image_file",
     "plant": "jagung"
 }
 ```
@@ -145,21 +145,92 @@ Deteksi penyakit tanaman.
 ```
 
 #### `GET /api/histories/map`  
-Mendapatkan data riwayat deteksi untuk keperluan peta persebaran.
+Mendapatkan data riwayat deteksi penyakit tanaman untuk keperluan peta persebaran.
 
 **Response Body:**
 ```json
 {
     "status": "success",
-    "data": {
-        "status": "disease 1",
-        "reason": "reason 1",
-        "indication": "indication 1",
-        "solution": " solution 1",
-        "plant": "jagung",
-        "medicine_image_url": "https://medicine_image_url.com",
-        "shop_url": "https://shop_url.com"
-    }
+    "data": [
+        {
+            "id": "unique_id",
+            "plant": "plant 1",
+            "image_url": "https://imaage_url.com",
+            "latitude": -7.7956,
+            "longitude": 110.3695,
+            "created_at": "",
+            "user": {
+                "fullname": "fullname 1"
+            },
+            "prediction": {
+                "status": "disease 1",
+                "reason": "reason 1",
+                "indication": "indication 1",
+                "solution": "solution 1",
+                "plant": "plant 1",
+                "medicine_image_url": "https://medicine_image_url.com",
+                "shop_url": "https://shop_url.com"
+            }
+        },
+        ...
+    ]
+}
+```
+
+#### `GET /api/histories`  
+Mendapat data riwayat deteksi penyakit tanaman.
+
+**Headers:**
+```json
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
+**Response Body:**
+```json
+{
+    "status": "success",
+    "data": [
+        {
+            "id": "unique_id",
+            "plant": "plant 1",
+            "image_url": "https://imaage_url.com",
+            "latitude": -7.7956,
+            "longitude": 110.3695,
+            "created_at": "",
+            "user": {
+                "fullname": "fullname 1"
+            },
+            "prediction": {
+                "status": "disease 1",
+                "reason": "reason 1",
+                "indication": "indication 1",
+                "solution": "solution 1",
+                "plant": "plant 1",
+                "medicine_image_url": "https://medicine_image_url.com",
+                "shop_url": "https://shop_url.com"
+            }
+        },
+        ...
+    ]
+}
+```
+
+#### `DELETE /api/histories/{id}`  
+Menghapus data riwayat deteksi penyakit tanaman.
+
+**Headers:**
+```json
+{
+    "Authorization": "Bearer <token>"
+}
+```
+
+**Response Body:**
+```json
+{
+    "status": "success"
 }
 ```
 

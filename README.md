@@ -87,7 +87,7 @@ Deteksi penyakit tanaman sebagai guest.
 **Request Body:**
 ```json
 {
-    "image": image_file,
+    "image": "image_file",
     "plant": "jagung"
 }
 ```
@@ -107,7 +107,6 @@ Deteksi penyakit tanaman sebagai guest.
     }
 }
 ```
-
 
 #### `POST /api/predict`  
 Deteksi penyakit tanaman.
